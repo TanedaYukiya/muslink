@@ -1,0 +1,64 @@
+﻿.hero {
+      background-image: url(<%= asset_path 'homepage.png' %>);
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      color: black;
+      padding: 120px 20px;
+    }
+
+<h1 class="text-3xl font-bold mb-6 text-white drop-shadow">Tweet 詳細</h1>
+
+<div class="bg-white bg-opacity-90 text-black shadow-md rounded-lg p-6 mb-8 space-y-4 max-w-2xl mx-auto">
+
+  <!-- 意見と投稿日時 -->
+  <p><strong 意見:</strong> <%= @tweet.opinion %></p>
+  <p><strong>投稿日時:</strong> <%= @tweet.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+
+  <!-- いいね機能 -->
+  <% if user_signed_in? %>
+    <% if current_user.already_liked?(@tweet) %>
+      <%= link_to tweet_like_path(@tweet), method: :delete, class: "inline-block text-red-500 hover:text-red-700 font-semibold" do %>
+        ❤️ いいねを取り消す（<%= @tweet.likes.count %>）
+      <% end %>
+    <% else %>
+      <%= link_to tweet_likes_path(@tweet), method: :post, class: "inline-block text-gray-500 hover:text-pink-500 font-semibold" do %>
+        🤍 いいね（<%= @tweet.likes.count %>）
+      <% end %>
+    <% end %>
+  <% else %>
+    <p>いいね数：<%= @tweet.likes.count %></p>
+  <% end %>
+
+  <!-- 削除ボタン（投稿者のみ表示したければ条件追加） -->
+  <div>
+    <%= button_to "🗑️ 削除する", tweet_path(@tweet), method: :delete,
+          data: { confirm: "本当に削除しますか？" },
+          class: "bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition" %>
+  </div>
+
+  <!-- タグ一覧 -->
+  <div>
+    <h3 class="text-lg font-semibold mb-2">タグ</h3>
+    <div class="flex flex-wrap gap-2">
+      <% @tweet.tags.each do |tag| %>
+        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">#<%= tag.name %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- いいねしたユーザー一覧 -->
+  <div>
+    <h3 class="text-lg font-semibold mb-2">👥 いいねしたユーザー</h3>
+    <ul class="list-disc list-inside text-sm text-gray-700">
+      <% @tweet.liked_users.each do |user| %>
+        <li><%= user.email %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<!-- 一覧に戻る -->
+<div class="text-center mt-6">
+  <%= link_to "← Tweet一覧に戻る", tweets_path, class: "inline-block text-white underline font-medium" %>
+</div>
